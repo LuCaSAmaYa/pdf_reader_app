@@ -1,0 +1,13 @@
+flutter/ephemeral
+.dart_tool/
+.idea/
+.vscode/
+build/
+ios/
+packages/
+*.iml
+*.lock
+.DS_Store
+.pub-cache
+.packages
+*.apk
