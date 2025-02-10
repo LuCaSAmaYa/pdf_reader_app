@@ -41,21 +41,9 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <!-- Para archivos en /storage con scheme 'file://' -->
-                <data
-                    android:scheme="file"
-                    android:host="*"
-                    android:pathPattern=".*\\.pdf"
-                    android:mimeType="application/pdf"/>
+                <data android:mimeType="application/pdf"/>
             </intent-filter>
 
-            <!-- Para URIs con scheme 'content://' (compartir desde otra app) -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <!-- Mismo MIME type -->
-                <data android:mimeType="application/pdf" />
-            </intent-filter>
         </activity>
 
         <!-- No borrar: Flutter lo usa para generar GeneratedPluginRegistrant.java -->
