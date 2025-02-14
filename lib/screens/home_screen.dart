@@ -1,33 +1,29 @@
-// lib/home_screen.dart
 import 'package:flutter/material.dart';
-import 'package:file_selector/file_selector.dart'; // Importamos file_selector
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:file_selector/file_selector.dart';
 import 'pdf_viewer.dart';
 import '../widgets/menu_drawer.dart';
+import '../providers/theme_provider.dart';
 
-class HomeScreen extends StatefulWidget {
-  final Function(String, bool) onThemeChanged;
-
-  const HomeScreen({super.key, required this.onThemeChanged});
+class HomeScreen extends ConsumerStatefulWidget {
+  const HomeScreen({super.key});
 
   @override
   HomeScreenState createState() => HomeScreenState();
 }
 
-class HomeScreenState extends State<HomeScreen> {
-  String? pdfPath; // Ruta del archivo PDF seleccionada
+class HomeScreenState extends ConsumerState<HomeScreen> {
+  String? pdfPath;
 
-  // Función para seleccionar un archivo PDF
   Future<void> pickPdfFile() async {
-    const XTypeGroup typeGroup = XTypeGroup(
-      label: 'PDFs',
-      extensions: ['pdf'],
-    );
+    const XTypeGroup typeGroup = XTypeGroup(label: 'PDFs', extensions: ['pdf']);
     final XFile? file = await openFile(acceptedTypeGroups: [typeGroup]);
 
     if (file != null && mounted) {
       setState(() {
         pdfPath = file.path;
       });
+
       if (mounted) {
         Navigator.push(
           context,
@@ -39,7 +35,8 @@ class HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final themeState = ref.watch(themeProvider);
+    bool isDark = themeState.isDarkTheme;
 
     return Scaffold(
       appBar: AppBar(

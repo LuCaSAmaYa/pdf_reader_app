@@ -1,19 +1,18 @@
-// lib/theme_settings/color_selection.dart
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../utils/theme_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../providers/theme_provider.dart';
 import '../../utils/theme_data.dart';
 
-class ColorSelection extends StatelessWidget {
+class ColorSelection extends ConsumerWidget {
   const ColorSelection({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    var themeProvider = Provider.of<ThemeProvider>(context);
-    bool isDark = themeProvider.isDarkTheme;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeState = ref.watch(themeProvider);
+    bool isDark = themeState.isDarkTheme;
 
     return GridView.count(
-      padding: const EdgeInsets.only(top: 10,  bottom: 70),
+      padding: const EdgeInsets.only(top: 10, bottom: 70),
       shrinkWrap: true,
       crossAxisCount: 3,
       crossAxisSpacing: 15,
@@ -21,12 +20,17 @@ class ColorSelection extends StatelessWidget {
       childAspectRatio: 1.0,
       physics: const NeverScrollableScrollPhysics(),
       children: subThemes.entries.map((entry) {
-        bool isSelected = themeProvider.selectedSubTheme == entry.key;
+        bool isSelected = themeState.selectedSubTheme == entry.key;
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             GestureDetector(
-              onTap: () => themeProvider.changeSubTheme(entry.key),
+              onTap: () {
+                ref.read(themeProvider.notifier).changeSubTheme(entry.key);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Color seleccionado: ${entry.key}')),
+                );
+              },
               child: Container(
                 width: 130,
                 height: 90,
@@ -63,11 +67,11 @@ class ColorSelection extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 color: isDark ? Colors.white : Colors.black,
               ),
-            ),                        
+            ),
           ],
         );
-      }).toList(),      
-    );    
+      }).toList(),
+    );
   }
 
   IconData _getIconForColor(String colorName) {

@@ -1,7 +1,5 @@
-// lib/theme_data.dart
 import 'package:flutter/material.dart';
 
-// Lista de colores para los subtemas
 final Map<String, Color> subThemes = {
   'Verde': Colors.green,
   'Naranja': Colors.orange,
@@ -11,30 +9,28 @@ final Map<String, Color> subThemes = {
   'Rojo': Colors.red,
   'Cyan': Colors.cyan,
   'Indigo': Colors.indigo,
-  'Verde Esmeralda': const Color(0xFF50C878),  // Verde moderno
-  'Azul Serenity': const Color(0xFF91A8D0),   // Azul moderno
-  'Rosa Palo': const Color(0xFFF4C2C2),       // Rosa claro
-  'Naranja Coral': const Color(0xFFFF6F61),   // Naranja moderno
+  'Verde Esmeralda': const Color(0xFF50C878),
+  'Azul Serenity': const Color(0xFF91A8D0),
+  'Rosa Palo': const Color(0xFFF4C2C2),
+  'Naranja Coral': const Color(0xFFFF6F61),
 };
 
-// Función para obtener el tema claro
 ThemeData getLightTheme(String subThemeKey) {
   final Color primaryColor = subThemes[subThemeKey] ?? Colors.blue;
   return ThemeData(
-    brightness: Brightness.light,  // Tema claro
-    primaryColor: primaryColor,   // Color principal basado en el subtema seleccionado
-    appBarTheme: AppBarTheme(backgroundColor: primaryColor),  // Color del AppBar
-    iconTheme: IconThemeData(color: primaryColor),  // Color de los íconos
+    brightness: Brightness.light,
+    primaryColor: primaryColor,
+    appBarTheme: AppBarTheme(backgroundColor: primaryColor),
+    iconTheme: IconThemeData(color: primaryColor),
   );
 }
 
-// Función para obtener el tema oscuro
 ThemeData getDarkTheme(String subThemeKey) {
   final Color primaryColor = subThemes[subThemeKey] ?? Colors.blue;
   return ThemeData(
-    brightness: Brightness.dark,  // Tema oscuro
-    primaryColor: primaryColor,  // Color principal basado en el subtema seleccionado
-    appBarTheme: AppBarTheme(backgroundColor: primaryColor),  // Color del AppBar
-    iconTheme: IconThemeData(color: primaryColor),  // Color de los íconos
+    brightness: Brightness.dark,
+    primaryColor: primaryColor,
+    appBarTheme: AppBarTheme(backgroundColor: primaryColor),
+    iconTheme: IconThemeData(color: primaryColor),
   );
 }

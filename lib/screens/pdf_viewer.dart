@@ -1,7 +1,6 @@
-// lib/pdf_viewer.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
-import '../../services/pdf_functions.dart';
+import '../services/pdf_functions.dart';
 
 class PdfViewerPage extends StatelessWidget {
   final String pdfPath;
@@ -19,7 +18,7 @@ class PdfViewerPage extends StatelessWidget {
             fontWeight: FontWeight.bold,
             shadows: [Shadow(blurRadius: 5, color: Colors.black26, offset: Offset(2, 2))],
           ),
-        ),
+        ), // 🔹 Cerramos el AppBar aquí correctamente
         actions: [
           IconButton(
             icon: const Icon(Icons.save, size: 30),

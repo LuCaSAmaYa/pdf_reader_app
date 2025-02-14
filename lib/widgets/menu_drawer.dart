@@ -1,15 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:pdf_reader_app/screens/settings_screen.dart';
-import 'package:pdf_reader_app/screens/about_screen.dart';
-import 'package:pdf_reader_app/utils/theme_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../screens/settings_screen.dart';
+import '../screens/about_screen.dart';
+import '../providers/theme_provider.dart';
 
-class MenuDrawer extends StatelessWidget {
+class MenuDrawer extends ConsumerWidget {
   const MenuDrawer({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    var themeProvider = Provider.of<ThemeProvider>(context);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeState = ref.watch(themeProvider);
+    bool isDark = themeState.isDarkTheme;
+    String selectedSubTheme = themeState.selectedSubTheme;
+
+    // Define un mapa de colores para los subtemas
+    final Map<String, Color> subThemeColors = {
+      'Verde': Colors.green,
+      'Azul': Colors.blue,
+      'Rojo': Colors.red,
+      'Naranja': Colors.orange,
+      'Púrpura': Colors.purple,
+    };
+
+    // Selecciona el color del subtema, si no existe usa azul por defecto
+    Color subThemeColor = subThemeColors[selectedSubTheme] ?? Colors.blue;
 
     return Drawer(
       child: ListView(
@@ -17,7 +31,7 @@ class MenuDrawer extends StatelessWidget {
         children: <Widget>[
           Container(
             decoration: BoxDecoration(
-              color: themeProvider.getThemeData().primaryColor.withAlpha(204),
+              color: isDark ? Colors.black87 : subThemeColor.withAlpha(204), // 🔹 Se usa el tema y subtema
               borderRadius: BorderRadius.circular(10),
               boxShadow: [
                 BoxShadow(
@@ -28,26 +42,26 @@ class MenuDrawer extends StatelessWidget {
               ],
             ),
             height: 80,
-            child: const Padding(
-              padding: EdgeInsets.only(bottom: 10),
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 10),
               child: Align(
                 alignment: Alignment.bottomLeft,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    SizedBox(width: 16),
+                    const SizedBox(width: 16),
                     Icon(
                       Icons.settings,
-                      color: Colors.white,
+                      color: isDark ? Colors.white : Colors.black, // 🔹 Cambia según el tema
                       size: 28,
                     ),
-                    SizedBox(width: 12),
+                    const SizedBox(width: 12),
                     Text(
                       'Opciones',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: isDark ? Colors.white : Colors.black, // 🔹 Cambia según el tema
                       ),
                     ),
                   ],
@@ -56,7 +70,7 @@ class MenuDrawer extends StatelessWidget {
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.color_lens, size: 28),
+            leading: Icon(Icons.color_lens, size: 28, color: subThemeColor), // 🔹 Aplica el color del subtema
             title: const Text(
               'Ajustes de Tema',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),

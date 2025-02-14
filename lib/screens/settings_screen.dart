@@ -1,16 +1,15 @@
-// lib/screens/settings_screen.dart
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../utils/theme_provider.dart';
-import '../screens/theme_settings/theme_selection.dart';
-import '../screens/theme_settings/color_selection.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/theme_provider.dart';
+import 'theme_settings/theme_selection.dart';
+import 'theme_settings/color_selection.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    var themeProvider = Provider.of<ThemeProvider>(context);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeState = ref.watch(themeProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -21,26 +20,23 @@ class SettingsScreen extends StatelessWidget {
             fontSize: 24,
           ),
         ),
-        backgroundColor: themeProvider.getThemeData().primaryColor,
+        backgroundColor: themeState.isDarkTheme ? Colors.black : Colors.white,
         elevation: 0,
       ),
       body: Container(
-        // Ocupa todo el ancho y alto de la pantalla
         width: double.infinity,
         height: double.infinity,
-        // Puedes cambiar EdgeInsets.only(...) por EdgeInsets.zero si quieres sin bordes
         padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Sección de selección de tema
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: themeProvider.isDarkTheme ? Colors.black : Colors.white,
+                color: themeState.isDarkTheme ? Colors.black : Colors.white,
                 borderRadius: BorderRadius.circular(15),
                 border: Border.all(
-                  color: themeProvider.isDarkTheme ? Colors.white : Colors.black,
+                  color: themeState.isDarkTheme ? Colors.white : Colors.black,
                   width: 2,
                 ),
                 boxShadow: [
@@ -54,15 +50,13 @@ class SettingsScreen extends StatelessWidget {
               child: const ThemeSelection(),
             ),
             const SizedBox(height: 20),
-
-            // Sección de selección de colores
             Center(
               child: Text(
                 'Seleccione el color del tema:',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: themeProvider.isDarkTheme ? Colors.white : Colors.black,
+                  color: themeState.isDarkTheme ? Colors.white : Colors.black,
                 ),
               ),
             ),
@@ -72,11 +66,10 @@ class SettingsScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: themeProvider.isDarkTheme ? Colors.grey : Colors.black54,
+                color: themeState.isDarkTheme ? Colors.grey : Colors.black54,
               ),
             ),
             const SizedBox(height: 10),
-
             Expanded(
               child: SingleChildScrollView(
                 child: const ColorSelection(),
