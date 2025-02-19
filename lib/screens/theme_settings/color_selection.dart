@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/theme_provider.dart';
-import '../../utils/theme_data.dart';
+import '../../utils/theme_data.dart'; // Importa 'theme_data.dart'
+import '../../utils/app_strings.dart';
 
 class ColorSelection extends ConsumerWidget {
   const ColorSelection({super.key});
@@ -9,18 +10,23 @@ class ColorSelection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeState = ref.watch(themeProvider);
-    bool isDark = themeState.isDarkTheme;
+    final appStrings = AppStrings(themeState.locale);
 
-    return GridView.count(
+    return GridView.builder(
       padding: const EdgeInsets.only(top: 10, bottom: 70),
       shrinkWrap: true,
-      crossAxisCount: 3,
-      crossAxisSpacing: 15,
-      mainAxisSpacing: 50,
-      childAspectRatio: 1.0,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 15,
+        mainAxisSpacing: 50,
+        childAspectRatio: 1.0,
+      ),
       physics: const NeverScrollableScrollPhysics(),
-      children: subThemes.entries.map((entry) {
+      itemCount: subThemes.length,
+      itemBuilder: (BuildContext context, int index) {
+        final entry = subThemes.entries.elementAt(index);
         bool isSelected = themeState.selectedSubTheme == entry.key;
+
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -28,7 +34,9 @@ class ColorSelection extends ConsumerWidget {
               onTap: () {
                 ref.read(themeProvider.notifier).changeSubTheme(entry.key);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Color seleccionado: ${entry.key}')),
+                  SnackBar(
+                    content: Text('${appStrings.getString('color_selection')}: ${appStrings.getColorName(entry.key)}'), // Usamos getColorName
+                  ),
                 );
               },
               child: Container(
@@ -43,7 +51,7 @@ class ColorSelection extends ConsumerWidget {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
+                      color: Colors.black.withAlpha(0x33),
                       spreadRadius: 2,
                       blurRadius: 6,
                     ),
@@ -60,49 +68,49 @@ class ColorSelection extends ConsumerWidget {
             ),
             const SizedBox(height: 7),
             Text(
-              entry.key,
+              appStrings.getColorName(entry.key), // Usamos getColorName
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : Colors.black,
+                color: themeState.isDarkTheme ? Colors.white : Colors.black,
               ),
             ),
           ],
         );
-      }).toList(),
+      },
     );
   }
 
   IconData _getIconForColor(String colorName) {
     switch (colorName) {
-      case 'Verde':
+      case 'Green':
         return Icons.eco;
-      case 'Naranja':
+      case 'Orange':
         return Icons.local_fire_department;
-      case 'Azul Pavo':
+      case 'Teal':
         return Icons.waves;
-      case 'Rosado':
+      case 'Pink':
         return Icons.local_florist;
-      case 'Morado':
+      case 'Purple':
         return Icons.spa;
-      case 'Rojo':
+      case 'Red':
         return Icons.favorite;
-      case 'Gris':
+      case 'Gray':
         return Icons.cloud;
       case 'Cyan':
         return Icons.pool;
       case 'Indigo':
         return Icons.remove_red_eye;
-      case 'Verde Esmeralda':
+      case 'Emerald Green':
         return Icons.park;
-      case 'Azul Serenity':
+      case 'Serenity Blue':
         return Icons.air;
-      case 'Palo Rosa':
+      case 'Brown':
         return Icons.color_lens;
-      case 'Naranja Coral':
+      case 'Coral Orange':
         return Icons.brightness_5;
-      case 'Azul Real':
+      case 'Royal Blue':
         return Icons.water_drop;
       default:
         return Icons.circle;

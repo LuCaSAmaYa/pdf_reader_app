@@ -4,6 +4,8 @@ import 'package:file_selector/file_selector.dart';
 import 'pdf_viewer.dart';
 import '../widgets/menu_drawer.dart';
 import '../providers/theme_provider.dart';
+import '../utils/app_strings.dart';
+import '../utils/theme_data.dart'; // Importa theme_data.dart
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -36,31 +38,50 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final themeState = ref.watch(themeProvider);
+    final appStrings = AppStrings(themeState.locale);
     bool isDark = themeState.isDarkTheme;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "Lector de PDFs",
+        title: Text(
+          appStrings.getString('app_name'),
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            shadows: [Shadow(blurRadius: 5, color: Colors.black26, offset: Offset(2, 2))],
+            shadows: const [Shadow(blurRadius: 5, color: Colors.black26, offset: Offset(2, 2))],
+            color: isDark ? Colors.white : Colors.black, // Cambia el color del texto del AppBar
+          ),
+        ),
+        backgroundColor: isDark ? Colors.black : Colors.white, // Cambia el color del AppBar
+        iconTheme: IconThemeData(color: subThemes[themeState.selectedSubTheme]), // Cambia el color del icono de hamburguesa
+        leading: Transform.scale( // <-- Escala el IconButton
+          scale: 1.2, // <-- Aumenta el tamaño en un 50%
+          child: Builder(
+            builder: (BuildContext context) {
+              return IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () {
+                  Scaffold.of(context).openDrawer();
+                },
+                iconSize: 36, // <-- Aumenta el tamaño del icono
+              );
+            },
           ),
         ),
       ),
       drawer: const MenuDrawer(),
+      backgroundColor: isDark ? themeState.darkBackgroundColor : Colors.white, // Cambia el color de fondo del Scaffold
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              "Bienvenido",
+              appStrings.getString('welcome'),
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
-                color: Theme.of(context).primaryColor,
+                color: subThemes[themeState.selectedSubTheme], // Usa el color del subtema
               ),
               textAlign: TextAlign.center,
             ),
@@ -73,7 +94,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                 color: isDark ? Colors.white : Colors.black,
               ),
               label: Text(
-                'SELECCIONAR PDF',
+                appStrings.getString('select_pdf'),
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -83,7 +104,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                backgroundColor: Theme.of(context).primaryColor,
+                backgroundColor: subThemes[themeState.selectedSubTheme], // Usa el color del subtema para el boton
                 shadowColor: Colors.black45,
                 elevation: 10,
               ),
