@@ -4,6 +4,7 @@ import 'package:pdf_reader_app/screens/theme_settings/color_selection.dart';
 import 'package:pdf_reader_app/screens/theme_settings/theme_selection.dart';
 import '../providers/theme_provider.dart';
 import '../utils/app_strings.dart';
+import '../utils/theme_data.dart'; // Importa theme_data.dart
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -15,8 +16,8 @@ class SettingsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton( // <-- Cambia el leading a IconButton
-          icon: Icon(Icons.arrow_back, color: themeState.isDarkTheme ? Colors.white : Colors.black), // <-- Cambia el color del Icon
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: themeState.isDarkTheme ? Colors.white : Colors.black),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
@@ -27,7 +28,7 @@ class SettingsScreen extends ConsumerWidget {
             color: themeState.isDarkTheme ? Colors.white : Colors.black,
           ),
         ),
-        backgroundColor: themeState.isDarkTheme ? Colors.black : Colors.white,
+        backgroundColor: subThemes[themeState.selectedSubTheme], // Usa el color del subtema
         elevation: 0,
       ),
       body: Container(
@@ -67,7 +68,7 @@ class SettingsScreen extends ConsumerWidget {
                               },
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          //const SizedBox(width: 10),
                           Text(
                             'es',
                             style: TextStyle(
@@ -76,7 +77,7 @@ class SettingsScreen extends ConsumerWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(width: 20),
+                          //const SizedBox(width: 20),
                           Transform.scale(
                             scale: 1.5,
                             child: Radio(
@@ -89,7 +90,7 @@ class SettingsScreen extends ConsumerWidget {
                               },
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          //const SizedBox(width: 10),
                           Text(
                             'en',
                             style: TextStyle(

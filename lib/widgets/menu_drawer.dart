@@ -20,8 +20,8 @@ class MenuDrawer extends ConsumerWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
-          SizedBox( // <-- Envuelve DrawerHeader en SizedBox
-            height: 130, // <-- Reduce la altura a la mitad (ajusta según sea necesario)
+          SizedBox(
+            height: 130,
             child: DrawerHeader(
               decoration: BoxDecoration(
                 color: subThemes[themeState.selectedSubTheme] ?? Theme.of(context).primaryColor,
@@ -36,10 +36,10 @@ class MenuDrawer extends ConsumerWidget {
             ),
           ),
           ListTile(
-            leading: Icon(Icons.settings, color: themeState.isDarkTheme ? Colors.white : Colors.black),
+            leading: Icon(Icons.settings, size: 30, color: themeState.isDarkTheme ? Colors.white : Colors.black), // Iconos más grandes
             title: Text(
               appStrings.getString('settings'),
-              style: TextStyle(color: themeState.isDarkTheme ? Colors.white : Colors.black),
+              style: TextStyle(fontSize: 20, color: themeState.isDarkTheme ? Colors.white : Colors.black), // Texto más grande
             ),
             onTap: () {
               Navigator.push(
@@ -49,10 +49,10 @@ class MenuDrawer extends ConsumerWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.info, color: themeState.isDarkTheme ? Colors.white : Colors.black),
+            leading: Icon(Icons.info, size: 30, color: themeState.isDarkTheme ? Colors.white : Colors.black), // Iconos más grandes
             title: Text(
               appStrings.getString('about'),
-              style: TextStyle(color: themeState.isDarkTheme ? Colors.white : Colors.black),
+              style: TextStyle(fontSize: 20, color: themeState.isDarkTheme ? Colors.white : Colors.black), // Texto más grande
             ),
             onTap: () {
               Navigator.push(
@@ -62,10 +62,10 @@ class MenuDrawer extends ConsumerWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.more, color: themeState.isDarkTheme ? Colors.white : Colors.black),
+            leading: Icon(Icons.more, size: 30, color: themeState.isDarkTheme ? Colors.white : Colors.black), // Iconos más grandes
             title: Text(
               appStrings.getString('more_info'),
-              style: TextStyle(color: themeState.isDarkTheme ? Colors.white : Colors.black),
+              style: TextStyle(fontSize: 20, color: themeState.isDarkTheme ? Colors.white : Colors.black), // Texto más grande
             ),
             onTap: () {
               Navigator.push(

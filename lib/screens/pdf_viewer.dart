@@ -48,14 +48,14 @@ class _PdfViewerPageState extends ConsumerState<PdfViewerPage> {
         backgroundColor: themeState.isDarkTheme ? Colors.black : Colors.white,
         actions: [
           IconButton(
-            icon: Icon(Icons.save, size: 30, color: subThemes[themeState.selectedSubTheme]), // Cambia el color del icono
+            icon: Icon(Icons.save, size: 30, color: subThemes[themeState.selectedSubTheme]),
             tooltip: appStrings.getString('save_pdf'),
             onPressed: () async {
-              final Completer<void> completer = Completer<void>();
+              final Completer<String?> completer = Completer<String?>(); // Cambia a Completer<String?>
               final state = this;
 
-              savePdfAs(context, ref, pdfPath).then((_) {
-                completer.complete();
+              savePdfAs(context, ref, pdfPath).then((savedPath) {
+                completer.complete(savedPath);
               }).catchError((error) {
                 completer.completeError(error);
                 if (state.mounted) {
@@ -64,11 +64,11 @@ class _PdfViewerPageState extends ConsumerState<PdfViewerPage> {
                   );
                 }
               }).whenComplete(() async {
-                await completer.future;
+                final savedPath = await completer.future; // Ahora es Future<String?>
 
-                if (state.mounted) {
+                if (state.mounted && savedPath != null) {
                   ScaffoldMessenger.of(state.context).showSnackBar(
-                    SnackBar(content: Text(appStrings.getString('file_saved'))),
+                    SnackBar(content: Text('${appStrings.getString('file_saved')} $savedPath')),
                   );
                 }
               });
