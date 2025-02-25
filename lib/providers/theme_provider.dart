@@ -38,25 +38,26 @@ class ThemeNotifier extends StateNotifier<ThemeState> {
   ThemeNotifier()
       : super(ThemeState(
           isDarkTheme: false,
-          selectedSubTheme: 'Verde',
-          locale: 'es',
-          darkBackgroundColor: Colors.grey[900]!,
+          selectedSubTheme: 'Green',
+          locale: 'en',
+          darkBackgroundColor: Colors.white,
           dropdownTextColor: Colors.black,
         )) {
-    loadPreferences();
+    _loadPreferences();
   }
 
-  Future<void> loadPreferences() async {
+  Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     final isDarkTheme = prefs.getBool('isDarkTheme') ?? false;
-    final selectedSubTheme = prefs.getString('selectedSubTheme') ?? 'Verde';
-    final locale = prefs.getString('locale') ?? 'es';
+    final selectedSubTheme = prefs.getString('selectedSubTheme') ?? 'Green';
+    final locale = prefs.getString('locale') ?? 'en';
     final darkBackgroundColor = prefs.getInt('darkBackgroundColor') != null
         ? Color(prefs.getInt('darkBackgroundColor')!)
-        : Colors.grey[900]!;
+        : (isDarkTheme ? Colors.grey[900]! : Colors.white);
     final dropdownTextColor = prefs.getInt('dropdownTextColor') != null
         ? Color(prefs.getInt('dropdownTextColor')!)
-        : Colors.black;
+        : (isDarkTheme ? Colors.white : Colors.black);
+
     state = ThemeState(
       isDarkTheme: isDarkTheme,
       selectedSubTheme: selectedSubTheme,
@@ -73,10 +74,12 @@ class ThemeNotifier extends StateNotifier<ThemeState> {
     final dropdownTextColor = isDarkTheme ? Colors.white : Colors.black;
     await prefs.setInt('darkBackgroundColor', darkBackgroundColor.value);
     await prefs.setInt('dropdownTextColor', dropdownTextColor.value);
+
     state = state.copyWith(
-        isDarkTheme: isDarkTheme,
-        darkBackgroundColor: darkBackgroundColor,
-        dropdownTextColor: dropdownTextColor);
+      isDarkTheme: isDarkTheme,
+      darkBackgroundColor: darkBackgroundColor,
+      dropdownTextColor: dropdownTextColor,
+    );
   }
 
   Future<void> changeSubTheme(String subTheme) async {

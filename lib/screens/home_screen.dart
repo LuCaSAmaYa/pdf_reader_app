@@ -5,7 +5,9 @@ import 'pdf_viewer.dart';
 import '../widgets/menu_drawer.dart';
 import '../providers/theme_provider.dart';
 import '../utils/app_strings.dart';
-import '../utils/theme_data.dart'; // Importa theme_data.dart
+import '../utils/theme_data.dart';
+import '../screens/initial_setup_screen.dart';
+import 'dart:async';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -16,6 +18,8 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class HomeScreenState extends ConsumerState<HomeScreen> {
   String? pdfPath;
+  int _tapCount = 0;
+  Timer? _timer;
 
   Future<void> pickPdfFile() async {
     const XTypeGroup typeGroup = XTypeGroup(label: 'PDFs', extensions: ['pdf']);
@@ -35,6 +39,28 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
+  void _handleTap() {
+    _tapCount++;
+    if (_timer != null && _timer!.isActive) {
+      _timer!.cancel();
+    }
+    _timer = Timer(const Duration(seconds: 4), () { // Tiempo de espera cambiado a 4 segundos
+      _tapCount = 0;
+    });
+    if (_tapCount == 7) {
+      _tapCount = 0;
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => const InitialSetupScreen()),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeState = ref.watch(themeProvider);
@@ -49,13 +75,13 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
             fontSize: 24,
             fontWeight: FontWeight.bold,
             shadows: const [Shadow(blurRadius: 5, color: Colors.black26, offset: Offset(2, 2))],
-            color: isDark ? Colors.white : Colors.black, // Cambia el color del texto del AppBar
+            color: isDark ? Colors.white : Colors.black,
           ),
         ),
-        backgroundColor: isDark ? Colors.black : Colors.white, // Cambia el color del AppBar
-        iconTheme: IconThemeData(color: subThemes[themeState.selectedSubTheme]), // Cambia el color del icono de hamburguesa
-        leading: Transform.scale( // <-- Escala el IconButton
-          scale: 1.2, // <-- Aumenta el tamaño en un 50%
+        backgroundColor: isDark ? Colors.black : Colors.white,
+        iconTheme: IconThemeData(color: subThemes[themeState.selectedSubTheme]),
+        leading: Transform.scale(
+          scale: 1.2,
           child: Builder(
             builder: (BuildContext context) {
               return IconButton(
@@ -63,14 +89,43 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                 onPressed: () {
                   Scaffold.of(context).openDrawer();
                 },
-                iconSize: 36, // <-- Aumenta el tamaño del icono
+                iconSize: 36,
               );
             },
           ),
         ),
       ),
-      drawer: const MenuDrawer(),
-      backgroundColor: isDark ? themeState.darkBackgroundColor : Colors.white, // Cambia el color de fondo del Scaffold
+      drawer: Drawer(
+        child: Stack(
+          children: [
+            const MenuDrawer(),
+            Align(
+              alignment: Alignment.bottomLeft,
+              child: GestureDetector(
+                onTap: _handleTap,
+                child: Container(
+                  width: 60,
+                  height: 60,
+                  color: Colors.transparent,
+                  child: Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Container(
+                      width: 10,
+                      height: 10,
+                      margin: const EdgeInsets.only(bottom: 20, left: 20),
+                      decoration: BoxDecoration(
+                        color: subThemes[themeState.selectedSubTheme],
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      backgroundColor: isDark ? themeState.darkBackgroundColor : Colors.white,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -81,7 +136,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
-                color: subThemes[themeState.selectedSubTheme], // Usa el color del subtema
+                color: subThemes[themeState.selectedSubTheme],
               ),
               textAlign: TextAlign.center,
             ),
@@ -104,7 +159,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                backgroundColor: subThemes[themeState.selectedSubTheme], // Usa el color del subtema para el boton
+                backgroundColor: subThemes[themeState.selectedSubTheme],
                 shadowColor: Colors.black45,
                 elevation: 10,
               ),

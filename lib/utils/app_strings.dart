@@ -52,7 +52,11 @@ class AppStrings {
     'phone': 'Teléfono:',
     'address': 'Dirección:',
     'app_name': 'Lector de PDFs',
-    // ... otros strings en español
+    'initialSetup': 'Configuración Inicial',
+    'color': 'Color:',
+    'darkTheme': 'Activar tema oscuro',
+    'saveSettings': 'Guardar Configuración',
+    'pdfReaderNoAds': 'PDF READER SIN ANUNCIOS',
   };
 
   static const Map<String, String> _englishStrings = {
@@ -83,7 +87,11 @@ class AppStrings {
     'phone': 'Phone:',
     'address': 'Address:',
     'app_name': 'PDF Reader',
-    // ... otros strings en inglés
+    'initialSetup': 'Initial Setup',
+    'color': 'Color:',
+    'darkTheme': 'Activate dark theme',
+    'saveSettings': 'Save Settings',
+    'pdfReaderNoAds': 'PDF READER NO ADS',
   };
 
   static const Map<String, String> _spanishColorNames = {
@@ -101,7 +109,6 @@ class AppStrings {
     'Rosewood': 'Palo Rosa',
     'Coral Orange': 'Naranja Coral',
     'Royal Blue': 'Azul Real',
-    // ... otros nombres de colores en español
   };
 
   static const Map<String, String> _englishColorNames = {
@@ -119,7 +126,6 @@ class AppStrings {
     'Brown': 'Brown',
     'Coral Orange': 'Coral Orange',
     'Royal Blue': 'Royal Blue',
-    // ... otros nombres de colores en inglés
   };
 
   static const supportedLocales = [

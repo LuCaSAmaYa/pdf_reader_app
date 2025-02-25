@@ -1,5 +1,19 @@
 import 'package:flutter/material.dart';
 
+// Temas de datos
+final ThemeData lightThemeData = ThemeData(
+  colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+  useMaterial3: true,
+  brightness: Brightness.light,
+);
+
+final ThemeData darkThemeData = ThemeData(
+  colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple, brightness: Brightness.dark),
+  useMaterial3: true,
+  brightness: Brightness.dark,
+);
+
+// Subtemas de color
 final Map<String, Color> subThemes = {
   'Green': Colors.green,
   'Orange': Colors.orange,
