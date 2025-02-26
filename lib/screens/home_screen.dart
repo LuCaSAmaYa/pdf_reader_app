@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_selector/file_selector.dart';
-import 'pdf_viewer.dart';
+import 'pdf_viewer.dart'; // Importar pdf_viewer.dart
 import '../widgets/menu_drawer.dart';
 import '../providers/theme_provider.dart';
 import '../utils/app_strings.dart';
 import '../utils/theme_data.dart';
 import '../screens/initial_setup_screen.dart';
 import 'dart:async';
+import '../models/pdf_document.dart';
+import '../providers/pdf_history_provider.dart';
+import 'history_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -26,14 +29,21 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
     final XFile? file = await openFile(acceptedTypeGroups: [typeGroup]);
 
     if (file != null && mounted) {
-      setState(() {
-        pdfPath = file.path;
-      });
+      final now = DateTime.now();
+      final pdfDocument = PdfDocument(
+        name: file.name,
+        path: file.path,
+        status: 'abierto',
+        date: now,
+      );
+      ref.read(pdfHistoryProvider.notifier).addPdf(pdfDocument);
 
       if (mounted) {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => PdfViewerPage(pdfPath: pdfPath!)),
+          MaterialPageRoute(
+              builder: (context) =>
+                  PdfViewerPage(pdfDocument: pdfDocument)), // Usar PdfViewerPage
         );
       }
     }
@@ -44,7 +54,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
     if (_timer != null && _timer!.isActive) {
       _timer!.cancel();
     }
-    _timer = Timer(const Duration(seconds: 4), () { // Tiempo de espera cambiado a 4 segundos
+    _timer = Timer(const Duration(seconds: 4), () {
       _tapCount = 0;
     });
     if (_tapCount == 7) {
@@ -74,7 +84,9 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            shadows: const [Shadow(blurRadius: 5, color: Colors.black26, offset: Offset(2, 2))],
+            shadows: const [
+              Shadow(blurRadius: 5, color: Colors.black26, offset: Offset(2, 2))
+            ],
             color: isDark ? Colors.white : Colors.black,
           ),
         ),
@@ -94,6 +106,17 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
             },
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.history),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const HistoryScreen()),
+              );
+            },
+          ),
+        ],
       ),
       drawer: Drawer(
         child: Stack(
@@ -157,8 +180,10 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8)),
                 backgroundColor: subThemes[themeState.selectedSubTheme],
                 shadowColor: Colors.black45,
                 elevation: 10,

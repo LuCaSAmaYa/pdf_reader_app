@@ -6,15 +6,17 @@ import 'package:pdf_reader_app/providers/theme_provider.dart';
 import 'package:pdf_reader_app/utils/app_strings.dart';
 import 'package:path/path.dart' as p;
 import '../utils/theme_data.dart';
+import '../models/pdf_document.dart';
+import '../providers/pdf_history_provider.dart'; // Importa pdfHistoryProvider
 
-Future<String?> savePdfAs(BuildContext context, WidgetRef ref, String pdfPath) async {
+Future<PdfDocument?> savePdfAs(BuildContext context, WidgetRef ref, PdfDocument pdfDocument) async {
   final themeState = ref.read(themeProvider);
   final appStrings = AppStrings(themeState.locale);
 
-  String fileName = p.basenameWithoutExtension(pdfPath);
+  String fileName = p.basenameWithoutExtension(pdfDocument.path);
   TextEditingController fileNameController = TextEditingController(text: fileName);
 
-  return showDialog<String>(
+  return showDialog<PdfDocument>(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
@@ -31,11 +33,11 @@ Future<String?> savePdfAs(BuildContext context, WidgetRef ref, String pdfPath) a
               labelText: appStrings.getString('file_name'),
               labelStyle: TextStyle(
                 color: themeState.isDarkTheme ? Colors.white : Colors.black,
-                fontSize: 18, // Aumenta el tamaño de la letra
+                fontSize: 18,
               ),
             ),
             style: TextStyle(color: themeState.isDarkTheme ? Colors.white : Colors.black),
-            maxLines: 3, // Permite hasta 3 líneas
+            maxLines: 3,
           ),
         ),
         actions: <Widget>[
@@ -63,10 +65,26 @@ Future<String?> savePdfAs(BuildContext context, WidgetRef ref, String pdfPath) a
                     directory = await getApplicationDocumentsDirectory();
                   }
                   String newPath = p.join(directory.path, '${fileNameController.text}.pdf');
-                  File originalFile = File(pdfPath);
+                  File originalFile = File(pdfDocument.path);
                   await originalFile.copy(newPath);
-                  Navigator.of(context).pop(newPath);
+
+                  final updatedPdf = PdfDocument(
+                    name: '${fileNameController.text}.pdf',
+                    path: newPath,
+                    status: 'guardado',
+                    date: DateTime.now(),
+                    originalPath: pdfDocument.path,
+                  );
+
+                  print('savePdfAs: Nuevo PdfDocument creado: ${updatedPdf.toJson()}'); // Registro
+
+                  ref.read(pdfHistoryProvider.notifier).updatePdf(updatedPdf);
+
+                  print('savePdfAs: updatePdf llamado con: ${updatedPdf.toJson()}'); // Registro
+
+                  Navigator.of(context).pop(updatedPdf);
                 } catch (e) {
+                  print('Error saving PDF: $e');
                   Navigator.of(context).pop(null);
                 }
               }
