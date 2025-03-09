@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/pdf_history_provider.dart';
-import 'pdf_viewer.dart';
+import 'pdf_viewer_page.dart';
 import '../models/pdf_document.dart';
 import 'package:intl/intl.dart';
 import '../providers/theme_provider.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_selector/file_selector.dart';
-import 'pdf_viewer.dart'; // Importar pdf_viewer.dart
+import 'pdf_viewer_page.dart'; // Importar pdf_viewer.dart
 import '../widgets/menu_drawer.dart';
 import '../providers/theme_provider.dart';
 import '../utils/app_strings.dart';
