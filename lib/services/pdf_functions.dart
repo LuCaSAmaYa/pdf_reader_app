@@ -7,17 +7,28 @@ import 'package:pdf_reader_app/utils/app_strings.dart';
 import 'package:path/path.dart' as p;
 import '../utils/theme_data.dart';
 import '../models/pdf_document.dart';
-import '../providers/pdf_history_provider.dart'; // Importa pdfHistoryProvider
+import '../providers/pdf_history_provider.dart';
+import '../screens/initial_setup_screen.dart';
 
-Future<PdfDocument?> savePdfAs(BuildContext context, WidgetRef ref, PdfDocument pdfDocument) async {
+Future<PdfDocument?> savePdfAs(WidgetRef ref, PdfDocument pdfDocument) async {
   final themeState = ref.read(themeProvider);
   final appStrings = AppStrings(themeState.locale);
 
   String fileName = p.basenameWithoutExtension(pdfDocument.path);
   TextEditingController fileNameController = TextEditingController(text: fileName);
+  
+  return _showSaveDialog(ref, fileNameController, appStrings, themeState, pdfDocument);
+}
 
+Future<PdfDocument?> _showSaveDialog(
+    WidgetRef ref,
+    TextEditingController fileNameController,
+    AppStrings appStrings,
+    ThemeState themeState,
+    PdfDocument pdfDocument,
+    ) {
   return showDialog<PdfDocument>(
-    context: context,
+    context: ref.read(navigationProvider).navigatorKey.currentContext!,
     builder: (BuildContext context) {
       return AlertDialog(
         backgroundColor: themeState.isDarkTheme ? themeState.darkBackgroundColor : Colors.white,
@@ -48,7 +59,7 @@ Future<PdfDocument?> savePdfAs(BuildContext context, WidgetRef ref, PdfDocument 
               style: TextStyle(fontSize: 20, color: subThemes[themeState.selectedSubTheme]),
             ),
             onPressed: () {
-              Navigator.of(context).pop(null);
+              ref.read(navigationProvider).navigatorKey.currentState!.pop(null);
             },
           ),
           TextButton.icon(
@@ -61,9 +72,7 @@ Future<PdfDocument?> savePdfAs(BuildContext context, WidgetRef ref, PdfDocument 
               if (fileNameController.text.isNotEmpty) {
                 try {
                   Directory? directory = await getExternalStorageDirectory();
-                  if (directory == null) {
-                    directory = await getApplicationDocumentsDirectory();
-                  }
+                  directory ??= await getApplicationDocumentsDirectory();
                   String newPath = p.join(directory.path, '${fileNameController.text}.pdf');
                   File originalFile = File(pdfDocument.path);
                   await originalFile.copy(newPath);
@@ -76,16 +85,10 @@ Future<PdfDocument?> savePdfAs(BuildContext context, WidgetRef ref, PdfDocument 
                     originalPath: pdfDocument.path,
                   );
 
-                  print('savePdfAs: Nuevo PdfDocument creado: ${updatedPdf.toJson()}'); // Registro
-
                   ref.read(pdfHistoryProvider.notifier).updatePdf(updatedPdf);
-
-                  print('savePdfAs: updatePdf llamado con: ${updatedPdf.toJson()}'); // Registro
-
-                  Navigator.of(context).pop(updatedPdf);
+                  ref.read(navigationProvider).navigatorKey.currentState!.pop(updatedPdf);
                 } catch (e) {
-                  print('Error saving PDF: $e');
-                  Navigator.of(context).pop(null);
+                  ref.read(navigationProvider).navigatorKey.currentState!.pop(null);
                 }
               }
             },

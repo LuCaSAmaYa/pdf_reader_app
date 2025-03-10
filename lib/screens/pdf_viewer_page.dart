@@ -76,11 +76,10 @@ class _PdfViewerPageState extends ConsumerState<PdfViewerPage> {
               final Completer<PdfDocument?> completer = Completer<PdfDocument?>();
               final state = this;
 
-              savePdfAs(context, ref, pdfDocument).then((updatedPdfDocument) {
-                print('pdf_viewer: savePdfAs completado con: ${updatedPdfDocument?.toJson()}');
+              //Se elimina el context de savePdfAs
+              savePdfAs(ref, pdfDocument).then((updatedPdfDocument) {
                 completer.complete(updatedPdfDocument);
               }).catchError((error) {
-                print('pdf_viewer: Error en savePdfAs: $error');
                 completer.completeError(error);
                 if (state.mounted) {
                   ScaffoldMessenger.of(state.context).showSnackBar(
@@ -94,7 +93,6 @@ class _PdfViewerPageState extends ConsumerState<PdfViewerPage> {
                 final updatedPdfDocument = await completer.future;
 
                 if (state.mounted && updatedPdfDocument != null) {
-                  print('pdf_viewer: updatePdf llamado con: ${updatedPdfDocument.toJson()}');
                   ref.read(pdfHistoryProvider.notifier).updatePdf(updatedPdfDocument);
                   setState(() {
                     pdfDocument = updatedPdfDocument;

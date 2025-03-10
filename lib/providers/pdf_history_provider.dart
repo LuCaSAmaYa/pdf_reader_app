@@ -15,9 +15,7 @@ class PdfHistoryNotifier extends StateNotifier<List<PdfDocument>> {
       state = historyJson
           .map((json) => PdfDocumentJson.fromJson(jsonDecode(json)))
           .toList();
-      print('History loaded: ${state.map((pdf) => pdf.toJson()).toList()}'); // Registro
     } catch (e) {
-      print('Error loading history: $e');
       // Puedes manejar el error de otra manera si es necesario
     }
   }
@@ -28,9 +26,7 @@ class PdfHistoryNotifier extends StateNotifier<List<PdfDocument>> {
       final historyJson =
           state.map((pdf) => jsonEncode(pdf.toJson())).toList();
       await prefs.setStringList('pdfHistory', historyJson);
-      print('History saved: $historyJson'); // Agregado para depuración
     } catch (e) {
-      print('Error saving history: $e');
       // Puedes manejar el error de otra manera si es necesario
     }
   }
@@ -41,20 +37,14 @@ class PdfHistoryNotifier extends StateNotifier<List<PdfDocument>> {
   }
 
   void updatePdf(PdfDocument updatedPdfDocument) {
-    print('updatePdf: Recibido PdfDocument: ${updatedPdfDocument.toJson()}'); // Registro
-
     final newState = [...state];
     bool updated = false;
 
     for (int i = 0; i < newState.length; i++) {
       final pdf = newState[i];
-      print('updatePdf: Comparando pdf con: ${pdf.toJson()}'); // Registro
-
-      // Si el originalPath coincide y no está vacío, o si el path coincide
       if ((pdf.originalPath == updatedPdfDocument.originalPath && pdf.originalPath.isNotEmpty) || (pdf.path == updatedPdfDocument.path)) {
         newState[i] = updatedPdfDocument;
         updated = true;
-        print('updatePdf: PdfDocument actualizado: ${updatedPdfDocument.toJson()}'); // Registro
         break;
       }
     }

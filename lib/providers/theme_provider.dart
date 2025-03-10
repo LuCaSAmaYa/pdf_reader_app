@@ -66,14 +66,15 @@ class ThemeNotifier extends StateNotifier<ThemeState> {
       dropdownTextColor: dropdownTextColor,
     );
   }
-
+    
   Future<void> toggleTheme(bool isDarkTheme) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isDarkTheme', isDarkTheme);
     final darkBackgroundColor = isDarkTheme ? Colors.grey[900]! : Colors.white;
     final dropdownTextColor = isDarkTheme ? Colors.white : Colors.black;
-    await prefs.setInt('darkBackgroundColor', darkBackgroundColor.value);
-    await prefs.setInt('dropdownTextColor', dropdownTextColor.value);
+
+    await prefs.setInt('darkBackgroundColor', darkBackgroundColor.toInt());
+    await prefs.setInt('dropdownTextColor', dropdownTextColor.toInt());
 
     state = state.copyWith(
       isDarkTheme: isDarkTheme,
@@ -92,6 +93,18 @@ class ThemeNotifier extends StateNotifier<ThemeState> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('locale', locale);
     state = state.copyWith(locale: locale);
+  }
+}
+
+// Nueva extensión para convertir Color a int y viceversa
+extension ColorUtils on Color {
+  int toInt() {
+    final alpha = (a * 255).toInt();
+    final red = (r * 255).toInt();
+    final green = (g * 255).toInt();
+    final blue = (b * 255).toInt();
+    // Combine the components into a single int using bit shifting
+    return (alpha << 24) | (red << 16) | (green << 8) | blue;
   }
 }
 

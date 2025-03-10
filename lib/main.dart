@@ -9,7 +9,6 @@ import 'utils/theme_data.dart';
 import 'screens/initial_setup_screen.dart';
 import 'models/pdf_document.dart';
 import 'screens/pdf_viewer_page.dart';
-import 'dart:ui';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,8 +29,8 @@ class MyApp extends ConsumerWidget {
     try {
       final String? result = await platform.invokeMethod('getInitialPdfPath');
       return result;
-    } on PlatformException catch (e) {
-      print("Error: ${e.message}");
+    } on PlatformException catch (_) {
+      // Solo dejamos catch(_)
       return null;
     }
   }
@@ -40,6 +39,8 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final themeState = ref.watch(themeProvider);
     return MaterialApp(
+      //Se añade el key al MaterialApp.
+      navigatorKey: ref.read(navigationProvider).navigatorKey,
       title: 'PDF Reader App',
       debugShowCheckedModeBanner: false,
       theme: themeState.isDarkTheme ? darkThemeData : lightThemeData,

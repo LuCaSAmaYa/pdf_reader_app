@@ -26,18 +26,46 @@ class InitialSetupScreenState extends ConsumerState<InitialSetupScreen> {
   Future<void> _getDefaultLocale() async {
     final locale = Intl.systemLocale;
     final languageCode = locale.split('_')[0];
-    setState(() {
-      _selectedLocale = languageCode == 'es' ? 'es' : 'en';
-    });
+    //No se llama a setState despues de un await.
+    _selectedLocale = languageCode == 'es' ? 'es' : 'en';
   }
+
+  //Funcion que guarda las preferencias y cambia de pagina.
+  Future<void> _saveAndNavigate(WidgetRef ref) async {
+     final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('initialSetupComplete', true);
+      await prefs.setString('selectedSubTheme', _selectedSubTheme);
+      await prefs.setBool('isDarkTheme', _isDarkTheme);
+      await prefs.setString('locale', _selectedLocale);
+      //Se obtiene el valor de themeNotifier de forma segura.
+      final themeNotifier = await _getThemeNotifier(ref);
+      //Se llama a la funcion asincrona para modificar las preferencias del tema
+      _applyThemeChanges(themeNotifier);
+        // Se navega directamente sin context, utilizando  ref.
+       ref.read(navigationProvider).navigateToHome();
+  }
+  //Funcion que obtiene el valor de themeNotifier
+    Future<ThemeNotifier> _getThemeNotifier(WidgetRef ref) async {
+        return await Future.microtask(() => ref.read(themeProvider.notifier));
+    }
+
+    //Se crea la funcion asincrona que utilizara el ref.
+    Future<void> _applyThemeChanges(ThemeNotifier themeNotifier) async {
+        themeNotifier.changeSubTheme(_selectedSubTheme);
+        themeNotifier.toggleTheme(_isDarkTheme);
+        themeNotifier.setLocale(_selectedLocale);
+    }
+
 
   @override
   Widget build(BuildContext context) {
     final backgroundColor = _isDarkTheme ? Colors.black : Colors.white;
-    final boxColor = subThemes[_selectedSubTheme]?.withOpacity(0.3) ?? Colors.grey.withOpacity(0.3);
+    final boxColor = subThemes[_selectedSubTheme]?.withAlpha((0.3 * 255).round()) ??
+        Colors.grey.withAlpha((0.3 * 255).round());
     final textColor = _isDarkTheme ? Colors.white : Colors.black;
     final titleFontSize = 18.0;
-    final dropdownBackgroundColor = _isDarkTheme ? Colors.black : Colors.grey[200]; // Color de fondo del Dropdown
+    final dropdownBackgroundColor =
+        _isDarkTheme ? Colors.black : Colors.grey[200]; // Color de fondo del Dropdown
 
     final translations = {
       'en': {
@@ -101,7 +129,7 @@ class InitialSetupScreenState extends ConsumerState<InitialSetupScreen> {
             borderRadius: BorderRadius.circular(10.0),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.5),
+                color: Colors.grey.withAlpha((0.5 * 255).round()),
                 spreadRadius: 3,
                 blurRadius: 7,
                 offset: const Offset(0, 3),
@@ -115,24 +143,26 @@ class InitialSetupScreenState extends ConsumerState<InitialSetupScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Text(currentTranslations['color']! + ' ', style: TextStyle(color: textColor, fontSize: titleFontSize)),
+                  Text('${currentTranslations['color']!} ',
+                      style: TextStyle(color: textColor, fontSize: titleFontSize)),
                   DropdownButton<String>(
                     value: _selectedSubTheme,
                     items: subThemes.keys.map((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
-                        child: Text(currentTranslations[value]!, style: TextStyle(color: textColor, fontSize: titleFontSize)),
+                        child: Text(currentTranslations[value]!,
+                            style: TextStyle(color: textColor, fontSize: titleFontSize)),
                       );
                     }).toList(),
                     onChanged: (value) {
-                      setState(() {
-                        _selectedSubTheme = value!;
-                      });
+                      //Solo se modifica el valor.
+                      _selectedSubTheme = value!;
                     },
-                    hint: Text(currentTranslations['selectColor'] ?? 'Select a color', style: TextStyle(color: textColor, fontSize: titleFontSize)),
+                    hint: Text(currentTranslations['selectColor'] ?? 'Select a color',
+                        style: TextStyle(color: textColor, fontSize: titleFontSize)),
                     borderRadius: BorderRadius.circular(10),
                     style: TextStyle(fontSize: titleFontSize, color: textColor),
-                    dropdownColor: dropdownBackgroundColor, // Color de fondo del Dropdown
+                    dropdownColor: dropdownBackgroundColor,
                     menuMaxHeight: 200,
                   ),
                 ],
@@ -148,9 +178,8 @@ class InitialSetupScreenState extends ConsumerState<InitialSetupScreen> {
                   Switch(
                     value: _isDarkTheme,
                     onChanged: (value) {
-                      setState(() {
-                        _isDarkTheme = value;
-                      });
+                       //Solo se modifica el valor.
+                       _isDarkTheme = value;
                     },
                   ),
                 ],
@@ -159,22 +188,29 @@ class InitialSetupScreenState extends ConsumerState<InitialSetupScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Text(currentTranslations['language']! + ' ', style: TextStyle(color: textColor, fontSize: titleFontSize)),
+                  Text('${currentTranslations['language']!} ',
+                      style: TextStyle(color: textColor, fontSize: titleFontSize)),
                   DropdownButton<String>(
                     value: _selectedLocale,
                     items: [
-                      DropdownMenuItem(value: 'en', child: Text('Inglés', style: TextStyle(color: textColor, fontSize: titleFontSize))),
-                      DropdownMenuItem(value: 'es', child: Text('Español', style: TextStyle(color: textColor, fontSize: titleFontSize))),
+                      DropdownMenuItem(
+                          value: 'en',
+                          child: Text('Inglés',
+                              style: TextStyle(color: textColor, fontSize: titleFontSize))),
+                      DropdownMenuItem(
+                          value: 'es',
+                          child: Text('Español',
+                              style: TextStyle(color: textColor, fontSize: titleFontSize))),
                     ],
                     onChanged: (value) {
-                      setState(() {
-                        _selectedLocale = value!;
-                      });
+                       //Solo se modifica el valor.
+                       _selectedLocale = value!;
                     },
-                    hint: Text(currentTranslations['selectLanguage'] ?? 'Select a language', style: TextStyle(color: textColor, fontSize: titleFontSize)),
+                    hint: Text(currentTranslations['selectLanguage'] ?? 'Select a language',
+                        style: TextStyle(color: textColor, fontSize: titleFontSize)),
                     borderRadius: BorderRadius.circular(10),
                     style: TextStyle(fontSize: titleFontSize, color: textColor),
-                    dropdownColor: dropdownBackgroundColor, // Color de fondo del Dropdown
+                    dropdownColor: dropdownBackgroundColor,
                     menuMaxHeight: 150,
                   ),
                 ],
@@ -182,20 +218,7 @@ class InitialSetupScreenState extends ConsumerState<InitialSetupScreen> {
               SizedBox(height: 60),
               ElevatedButton(
                 onPressed: () async {
-                  final prefs = await SharedPreferences.getInstance();
-                  await prefs.setBool('initialSetupComplete', true);
-                  await prefs.setString('selectedSubTheme', _selectedSubTheme);
-                  await prefs.setBool('isDarkTheme', _isDarkTheme);
-                  await prefs.setString('locale', _selectedLocale);
-
-                  final themeNotifier = ref.read(themeProvider.notifier);
-                  themeNotifier.changeSubTheme(_selectedSubTheme);
-                  themeNotifier.toggleTheme(_isDarkTheme);
-                  themeNotifier.setLocale(_selectedLocale);
-
-                  if (mounted) {
-                    Navigator.of(context).pushReplacementNamed('/home');
-                  }
+                    await _saveAndNavigate(ref);
                 },
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
@@ -213,5 +236,16 @@ class InitialSetupScreenState extends ConsumerState<InitialSetupScreen> {
         ),
       ),
     );
+  }
+}
+//Provider para la navegacion
+final navigationProvider = Provider<NavigationService>((ref) => NavigationService());
+
+//Clase para la navegacion
+class NavigationService {
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+   Future<dynamic> navigateToHome() {
+    return navigatorKey.currentState!.pushReplacementNamed('/home');
   }
 }

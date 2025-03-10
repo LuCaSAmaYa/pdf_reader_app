@@ -11,10 +11,10 @@ class HistoryScreen extends ConsumerStatefulWidget {
   const HistoryScreen({super.key});
 
   @override
-  _HistoryScreenState createState() => _HistoryScreenState();
+  HistoryScreenState createState() => HistoryScreenState(); // Hacer HistoryScreenState público
 }
 
-class _HistoryScreenState extends ConsumerState<HistoryScreen> {
+class HistoryScreenState extends ConsumerState<HistoryScreen> { // Hacer HistoryScreenState público
   int _selectedTabIndex = 0;
 
   @override
@@ -23,15 +23,12 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     final themeState = ref.watch(themeProvider);
     final abiertos = history.where((pdf) => pdf.status == 'abierto').toList().reversed.toList();
     final guardados = history.where((pdf) => pdf.status == 'guardado').toList().reversed.toList();
-
-    print('Abiertos: ${abiertos.map((pdf) => pdf.path).toList()}');
-    print('Guardados: ${guardados.map((pdf) => pdf.path).toList()}');
-
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Historial'),
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(70.0), // Ajustar la altura
+          preferredSize: const Size.fromHeight(70.0),
           child: Column(
             children: [
               Row(
@@ -51,15 +48,15 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                           Text(
                             'Abiertos',
                             style: TextStyle(
-                              fontSize: _selectedTabIndex == 0 ? 20 : 12, // Tamaños de fuente ajustados
+                              fontSize: _selectedTabIndex == 0 ? 20 : 12,
                             ),
                           ),
                           if (_selectedTabIndex == 0)
                             Padding(
-                              padding: const EdgeInsets.only(left: 8.0), // Espacio aumentado
+                              padding: const EdgeInsets.only(left: 8.0),
                               child: Icon(Icons.check,
                                   color: subThemes[themeState.selectedSubTheme]!,
-                                  size: 24.0), // Icono más grande
+                                  size: 24.0),
                             ),
                         ],
                       ),
@@ -79,15 +76,15 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                           Text(
                             'Guardados',
                             style: TextStyle(
-                              fontSize: _selectedTabIndex == 1 ? 20 : 12, // Tamaños de fuente ajustados
+                              fontSize: _selectedTabIndex == 1 ? 20 : 12,
                             ),
                           ),
                           if (_selectedTabIndex == 1)
                             Padding(
-                              padding: const EdgeInsets.only(left: 8.0), // Espacio aumentado
+                              padding: const EdgeInsets.only(left: 8.0),
                               child: Icon(Icons.check,
                                   color: subThemes[themeState.selectedSubTheme]!,
-                                  size: 24.0), // Icono más grande
+                                  size: 24.0),
                             ),
                         ],
                       ),
@@ -95,7 +92,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                   ),
                 ],
               ),
-              const Divider(height: 1.0, thickness: 1.0), // Línea divisoria debajo de los títulos
+              const Divider(height: 1.0, thickness: 1.0),
             ],
           ),
         ),
@@ -117,8 +114,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     );
   }
 
-  Widget _buildPdfList(List<PdfDocument> pdfList) {
-    print('history_screen: Reconstruyendo lista con ${pdfList.length} elementos');
+  Widget _buildPdfList(List<PdfDocument> pdfList) {    
 
     return ListView.builder(
       itemCount: pdfList.length,
