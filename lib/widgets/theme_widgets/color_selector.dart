@@ -4,8 +4,8 @@ import '../../providers/theme_provider.dart';
 import '../../utils/theme_data.dart'; // Importa 'theme_data.dart'
 import '../../utils/app_strings.dart';
 
-class ColorSelection extends ConsumerWidget {
-  const ColorSelection({super.key});
+class ColorSelector extends ConsumerWidget {
+  const ColorSelector({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

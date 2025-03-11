@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pdf_reader_app/screens/theme_settings/color_selection.dart';
-import 'package:pdf_reader_app/screens/theme_settings/theme_selection.dart';
+import '../widgets/settings_widgets/language_selector.dart'; // Importar LanguageSelector
+import '../widgets/settings_widgets/theme_section.dart'; // Importar ThemeSection
+import '../widgets/settings_widgets/color_section.dart'; // Importar ColorSection
 import '../providers/theme_provider.dart';
 import '../utils/app_strings.dart';
-import '../utils/theme_data.dart'; // Importa theme_data.dart
+import '../utils/theme_data.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -28,7 +29,7 @@ class SettingsScreen extends ConsumerWidget {
             color: themeState.isDarkTheme ? Colors.white : Colors.black,
           ),
         ),
-        backgroundColor: subThemes[themeState.selectedSubTheme], // Usa el color del subtema
+        backgroundColor: subThemes[themeState.selectedSubTheme],
         elevation: 0,
       ),
       body: Container(
@@ -39,100 +40,19 @@ class SettingsScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ... (resto del código sin cambios)
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        appStrings.getString('language'),
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: themeState.isDarkTheme ? Colors.white : Colors.black,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Transform.scale(
-                            scale: 1.5,
-                            child: Radio(
-                              value: 'es',
-                              groupValue: themeState.locale,
-                              onChanged: (String? value) {
-                                if (value != null) {
-                                  ref.read(themeProvider.notifier).setLocale(value);
-                                }
-                              },
-                            ),
-                          ),
-                          //const SizedBox(width: 10),
-                          Text(
-                            'es',
-                            style: TextStyle(
-                              color: themeState.dropdownTextColor,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          //const SizedBox(width: 20),
-                          Transform.scale(
-                            scale: 1.5,
-                            child: Radio(
-                              value: 'en',
-                              groupValue: themeState.locale,
-                              onChanged: (String? value) {
-                                if (value != null) {
-                                  ref.read(themeProvider.notifier).setLocale(value);
-                                }
-                              },
-                            ),
-                          ),
-                          //const SizedBox(width: 10),
-                          Text(
-                            'en',
-                            style: TextStyle(
-                              color: themeState.dropdownTextColor,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 5),
-
-                // Sección de Tema (Claro/Oscuro)
                 Text(
-                  appStrings.getString('theme'),
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: themeState.isDarkTheme ? Colors.white : Colors.black,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                const Center(
-                  child: ThemeSelection(),
-                ),
-
+                      appStrings.getString('language'),
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: themeState.isDarkTheme ? Colors.white : Colors.black,
+                      ),
+                    ),
+                const LanguageSelector(), // Utilizar LanguageSelector
                 const SizedBox(height: 20),
-
-                // Sección de Selección de Color
-                Text(
-                  appStrings.getString('color_selection'),
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: themeState.isDarkTheme ? Colors.white : Colors.black,
-                  ),
-                ),
-                const ColorSelection(),
+                const ThemeSection(), // Utilizar ThemeSection
+                const SizedBox(height: 20),
+                const ColorSection(), // Utilizar ColorSection
               ],
             ),
           ),

@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/theme_provider.dart';
 import '../../utils/app_strings.dart';
 
-class ThemeSelection extends ConsumerWidget {
-  const ThemeSelection({super.key});
+class ThemeSelector extends ConsumerWidget {
+  const ThemeSelector({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
