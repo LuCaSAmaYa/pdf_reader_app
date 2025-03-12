@@ -16,15 +16,17 @@ class PdfFileNameTextField extends ConsumerWidget {
 
     return TextField(
       controller: fileNameController,
+      maxLines: 3,
+       //minLines: 1, //Se añade el parametro.
       decoration: InputDecoration(
         labelText: appStrings.getString('file_name'),
         labelStyle: TextStyle(
           color: themeState.isDarkTheme ? Colors.white : Colors.black,
           fontSize: 18,
         ),
+         border: const OutlineInputBorder(), //Se añade el borde.
       ),
-      style: TextStyle(color: themeState.isDarkTheme ? Colors.white : Colors.black),
-      maxLines: 3,
+       //Se elimina el estilo del texto.
     );
   }
 }

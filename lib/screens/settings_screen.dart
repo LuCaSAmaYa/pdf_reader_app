@@ -40,14 +40,6 @@ class SettingsScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                      appStrings.getString('language'),
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: themeState.isDarkTheme ? Colors.white : Colors.black,
-                      ),
-                    ),
                 const LanguageSelector(), // Utilizar LanguageSelector
                 const SizedBox(height: 20),
                 const ThemeSection(), // Utilizar ThemeSection

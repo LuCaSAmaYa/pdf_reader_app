@@ -1,12 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pdf_reader_app/screens/settings_screen.dart';//Se importa la nueva screen.
-import 'package:pdf_reader_app/screens/initial_setup_screen.dart';
+import 'package:pdf_reader_app/screens/settings_screen.dart';
 import 'providers/theme_provider.dart';
 import 'utils/theme_data.dart';
 import 'screens/home_screen.dart';
 import 'widgets/initial_setup_checker.dart';
+
+//Se crea el provider de forma global.
+final navigationProvider = Provider<NavigationService>((ref) => NavigationService());
+
+//Clase que gestiona la navegacion.
+class NavigationService {
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+  void navigateToHome() {
+    navigatorKey.currentState?.pushReplacementNamed('/home');
+  }
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,7 +31,7 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final themeState = ref.watch(themeProvider);
     return MaterialApp(
-      navigatorKey: ref.read(navigationProvider).navigatorKey,
+      navigatorKey: ref.read(navigationProvider).navigatorKey, //Se usa el provider global.
       title: 'PDF Reader App',
       debugShowCheckedModeBanner: false,
       theme: themeState.isDarkTheme ? darkThemeData : lightThemeData,
@@ -28,7 +39,7 @@ class MyApp extends ConsumerWidget {
       routes: {
         '/': (context) => const InitialSetupChecker(),
         '/home': (context) => const HomeScreen(),
-        '/settings': (context) => const SettingsScreen(), //Se añade la nueva ruta.
+        '/settings': (context) => const SettingsScreen(),
       },
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
