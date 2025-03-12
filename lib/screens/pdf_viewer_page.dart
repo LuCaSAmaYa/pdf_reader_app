@@ -5,10 +5,9 @@ import '../services/pdf_functions.dart';
 import '../utils/app_strings.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/theme_provider.dart';
-//import '../utils/theme_data.dart';
 import '../models/pdf_document.dart';
 import '../providers/pdf_history_provider.dart';
-import '../widgets/custom_button.dart';//Se importa el nuevo widget
+import '../widgets/app_button.dart'; //Se importa el nuevo widget.
 
 class PdfViewerPage extends ConsumerStatefulWidget {
   final PdfDocument pdfDocument;
@@ -70,41 +69,42 @@ class _PdfViewerPageState extends ConsumerState<PdfViewerPage> {
         backgroundColor: themeState.isDarkTheme ? Colors.black : Colors.white,
         actions: [
           //Se utiliza el nuevo widget.
-            CustomButton(
-              onPressed: () async {
-                final Completer<PdfDocument?> completer = Completer<PdfDocument?>();
-                final state = this;
+          AppButton(
+            onPressed: () async {
+              final Completer<PdfDocument?> completer = Completer<PdfDocument?>();
+              final state = this;
 
-                savePdfAs(ref, pdfDocument).then((updatedPdfDocument) {
-                  completer.complete(updatedPdfDocument);
-                }).catchError((error) {
-                  completer.completeError(error);
-                  if (state.mounted) {
-                    ScaffoldMessenger.of(state.context).showSnackBar(
-                      SnackBar(
-                          content: Text(
-                              appStrings.getString('error_saving') +
-                                  error.toString())),
-                    );
-                  }
-                }).whenComplete(() async {
-                  final updatedPdfDocument = await completer.future;
+              savePdfAs(ref, pdfDocument).then((updatedPdfDocument) {
+                completer.complete(updatedPdfDocument);
+              }).catchError((error) {
+                completer.completeError(error);
+                if (state.mounted) {
+                  ScaffoldMessenger.of(state.context).showSnackBar(
+                    SnackBar(
+                        content: Text(
+                            appStrings.getString('error_saving') +
+                                error.toString())),
+                  );
+                }
+              }).whenComplete(() async {
+                final updatedPdfDocument = await completer.future;
 
-                  if (state.mounted && updatedPdfDocument != null) {
-                    ref.read(pdfHistoryProvider.notifier).updatePdf(updatedPdfDocument);
-                    setState(() {
-                      pdfDocument = updatedPdfDocument;
-                    });
-                    ScaffoldMessenger.of(state.context).showSnackBar(
-                      SnackBar(
-                          content: Text(
-                              '${appStrings.getString('file_saved')} ${updatedPdfDocument.path}')),
-                    );
-                  }
-                });
-              },
-               showText: false, //Se añade el nuevo parametro con false.
-            ),
+                if (state.mounted && updatedPdfDocument != null) {
+                  ref.read(pdfHistoryProvider.notifier).updatePdf(updatedPdfDocument);
+                  setState(() {
+                    pdfDocument = updatedPdfDocument;
+                  });
+                  ScaffoldMessenger.of(state.context).showSnackBar(
+                    SnackBar(
+                        content: Text(
+                            '${appStrings.getString('file_saved')} ${updatedPdfDocument.path}')),
+                  );
+                }
+              });
+            },
+            icon: Icons.save, //Se cambia el icono.
+             useSubThemeColor: true, //Se añade el nuevo parametro
+          ),
         ],
       ),
       backgroundColor: themeState.isDarkTheme

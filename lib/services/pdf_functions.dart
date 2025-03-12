@@ -5,9 +5,11 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import '../models/pdf_document.dart';
 import '../providers/pdf_history_provider.dart';
-import '../main.dart'; // <-- Importa el archivo main.dart.
-import '../widgets/custom_button.dart';
-import '../widgets/pdf_widgets/pdf_file_name_text_field.dart'; // Importar el antiguo widget
+import '../main.dart';
+import '../widgets/app_button.dart';
+import '../widgets/pdf_widgets/pdf_file_name_text_field.dart';
+import '../providers/theme_provider.dart'; //Se importa el provider
+import '../utils/app_strings.dart';//Se importa appStrings
 
 Future<PdfDocument?> savePdfAs(WidgetRef ref, PdfDocument pdfDocument) async {
   String fileName = p.basenameWithoutExtension(pdfDocument.path);
@@ -22,22 +24,34 @@ Future<PdfDocument?> _showSaveDialog(
     WidgetRef ref,
     TextEditingController fileNameController,
     PdfDocument pdfDocument) {
+       final themeState = ref.watch(themeProvider);
+       final appStrings = AppStrings(themeState.locale);//Se crea la variable.
   return showDialog<PdfDocument>(
     //Se utiliza el context del navigator key
-    context: ref.read(navigationProvider).navigatorKey.currentContext!, // <-- Ahora navigationProvider es accesible.
+    context: ref.read(navigationProvider).navigatorKey.currentContext!,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Text('Guardar Archivo PDF'),
+        title:  Text(appStrings.getString('save_pdf')), //Se modifica el texto para que utilice appStrings
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Se usa el antiguo widget
+            // Se usa el widget
             PdfFileNameTextField(fileNameController: fileNameController),
           ],
         ),
         actions: [
-          //Se utiliza el nuevo widget.
-          CustomButton(
+          //Se utiliza el nuevo widget para cancelar.
+          AppButton(
+            onPressed: () {
+              Navigator.of(ref.read(navigationProvider).navigatorKey.currentContext!).pop(null);
+            },
+            icon: Icons.cancel,
+            text: 'cancel',
+            useSubThemeColor: false, //Se modifica el parametro
+             iconSize: 35, //Se añade el parametro.
+          ),
+          //Se utiliza el nuevo widget para guardar.
+          AppButton(
             onPressed: () async {
               if (fileNameController.text.isNotEmpty) {
                 try {
@@ -57,17 +71,18 @@ Future<PdfDocument?> _showSaveDialog(
 
                   ref.read(pdfHistoryProvider.notifier).updatePdf(updatedPdf);
                   //Se elimina el uso del context directamente.
-                  Navigator.of(ref.read(navigationProvider).navigatorKey.currentContext!).pop(updatedPdf); // <-- Ahora navigationProvider es accesible.
+                  Navigator.of(ref.read(navigationProvider).navigatorKey.currentContext!).pop(updatedPdf);
                 } catch (e) {
                   //Se elimina el uso del context directamente.
-                  Navigator.of(ref.read(navigationProvider).navigatorKey.currentContext!).pop(null); // <-- Ahora navigationProvider es accesible.
+                  Navigator.of(ref.read(navigationProvider).navigatorKey.currentContext!).pop(null);
                 }
               }
             },
-            showCancelButton: true,
-            showText: true, //Se añade el nuevo parametro.
-            text: 'save', //Se añade el nuevo parametro
-          )
+            icon: Icons.save,
+            text: 'save',
+            useSubThemeColor: false, //Se modifica el parametro
+            iconSize: 35,//Se añade el parametro.
+          ),
         ],
       );
     },

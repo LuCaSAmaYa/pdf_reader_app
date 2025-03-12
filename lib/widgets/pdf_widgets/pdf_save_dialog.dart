@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../utils/app_strings.dart';
 import '../../providers/theme_provider.dart';
-import 'pdf_file_name_text_field.dart'; //Se modifica el import.
-import 'pdf_save_cancel_buttons.dart'; //Se modifica el import.
+import '../app_button.dart';//Se modifica el import.
+import 'pdf_file_name_text_field.dart';
 
 //Widget para el alert dialog completo.
 class PdfSaveDialog extends ConsumerWidget {
@@ -34,7 +34,19 @@ class PdfSaveDialog extends ConsumerWidget {
         child: PdfFileNameTextField(fileNameController: fileNameController),
       ),
       actions: <Widget>[
-        PdfSaveCancelButtons(onCancelPressed: onCancelPressed, onSavePressed: onSavePressed)
+          //Se utiliza el nuevo widget.
+          AppButton(
+            onPressed: onCancelPressed,
+            icon: Icons.cancel,
+            text: 'cancel',
+            useSubThemeColor: true,
+          ),
+            AppButton(
+            onPressed: onSavePressed,
+            icon: Icons.save,
+            text: 'save',
+            useSubThemeColor: true,
+          ),
       ],
     );
   }

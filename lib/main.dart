@@ -6,6 +6,7 @@ import 'providers/theme_provider.dart';
 import 'utils/theme_data.dart';
 import 'screens/home_screen.dart';
 import 'widgets/initial_setup_checker.dart';
+//import 'widgets/app_button.dart'; //Se importa app button
 
 //Se crea el provider de forma global.
 final navigationProvider = Provider<NavigationService>((ref) => NavigationService());
