@@ -1,32 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/pdf_history_provider.dart';
-import 'pdf_viewer_page.dart';
-import '../models/pdf_document.dart';
-import 'package:intl/intl.dart';
+//import '../models/pdf_document.dart';
 import '../providers/theme_provider.dart';
-import '../utils/theme_data.dart';
+import '../utils/app_strings.dart';
+import '../widgets/history_widgets/pdf_list.dart';
+import '../widgets/history_widgets/tab_section.dart';
 
 class HistoryScreen extends ConsumerStatefulWidget {
   const HistoryScreen({super.key});
 
   @override
-  HistoryScreenState createState() => HistoryScreenState(); // Hacer HistoryScreenState público
+  HistoryScreenState createState() => HistoryScreenState();
 }
 
-class HistoryScreenState extends ConsumerState<HistoryScreen> { // Hacer HistoryScreenState público
+class HistoryScreenState extends ConsumerState<HistoryScreen> {
   int _selectedTabIndex = 0;
+
+  void _onTabSelected(int index) {
+    setState(() {
+      _selectedTabIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final history = ref.watch(pdfHistoryProvider);
     final themeState = ref.watch(themeProvider);
-    final abiertos = history.where((pdf) => pdf.status == 'abierto').toList().reversed.toList();
-    final guardados = history.where((pdf) => pdf.status == 'guardado').toList().reversed.toList();
-    
+    final appStrings = AppStrings(themeState.locale);
+    final abiertos = history.where((pdf) => pdf.status == 'abierto').toList();
+    abiertos.sort((a, b) => b.date.compareTo(a.date)); //Se ordena la lista.
+    //final abiertosReversed = abiertos.reversed.toList();//Se elimina la linea.
+    final guardados = history.where((pdf) => pdf.status == 'guardado').toList();
+    guardados.sort((a, b) => b.date.compareTo(a.date)); //Se ordena la lista.
+    //final guardadosReversed = guardados.reversed.toList();//Se elimina la linea.
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Historial'),
+        title: Text(appStrings.getString('history')),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(70.0),
           child: Column(
@@ -34,61 +45,17 @@ class HistoryScreenState extends ConsumerState<HistoryScreen> { // Hacer History
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedTabIndex = 0;
-                      });
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Abiertos',
-                            style: TextStyle(
-                              fontSize: _selectedTabIndex == 0 ? 20 : 12,
-                            ),
-                          ),
-                          if (_selectedTabIndex == 0)
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: Icon(Icons.check,
-                                  color: subThemes[themeState.selectedSubTheme]!,
-                                  size: 24.0),
-                            ),
-                        ],
-                      ),
-                    ),
+                  TabSection(
+                    selectedTabIndex: _selectedTabIndex,
+                    onTap: _onTabSelected,
+                    appStrings: appStrings,
+                    tabIndex: 0,
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedTabIndex = 1;
-                      });
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Guardados',
-                            style: TextStyle(
-                              fontSize: _selectedTabIndex == 1 ? 20 : 12,
-                            ),
-                          ),
-                          if (_selectedTabIndex == 1)
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: Icon(Icons.check,
-                                  color: subThemes[themeState.selectedSubTheme]!,
-                                  size: 24.0),
-                            ),
-                        ],
-                      ),
-                    ),
+                  TabSection(
+                    selectedTabIndex: _selectedTabIndex,
+                    onTap: _onTabSelected,
+                    appStrings: appStrings,
+                    tabIndex: 1,
                   ),
                 ],
               ),
@@ -104,74 +71,13 @@ class HistoryScreenState extends ConsumerState<HistoryScreen> { // Hacer History
             child: IndexedStack(
               index: _selectedTabIndex,
               children: [
-                _buildPdfList(abiertos),
-                _buildPdfList(guardados),
+                PdfList(pdfList: abiertos), //Se modifica la lista.
+                PdfList(pdfList: guardados), //Se modifica la lista.
               ],
             ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildPdfList(List<PdfDocument> pdfList) {    
-
-    return ListView.builder(
-      itemCount: pdfList.length,
-      itemBuilder: (context, index) {
-        final pdf = pdfList[index];
-        return Column(
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(DateFormat('yyyy-MM-dd HH:mm').format(pdf.date)),
-                  ),
-                ),
-                Expanded(
-                  flex: 3,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(pdf.name, style: const TextStyle(fontSize: 16)),
-                  ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: IconButton(
-                    icon: const Icon(Icons.open_in_new),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => PdfViewerPage(pdfDocument: pdf)),
-                      );
-                    },
-                  ),
-                ),
-                Expanded(
-                  flex: 2,
-                  child: ExpansionTile(
-                    title: const Icon(Icons.folder),
-                    children: [
-                      ListTile(
-                        title: Text('Ruta: ${pdf.path}', style: const TextStyle(fontSize: 16)),
-                      ),
-                      if (pdf.originalPath.isNotEmpty)
-                        ListTile(
-                          title: Text('Original: ${pdf.originalPath}',
-                              style: const TextStyle(fontSize: 16)),
-                        ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            Divider(),
-          ],
-        );
-      },
     );
   }
 }

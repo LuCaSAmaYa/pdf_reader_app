@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_selector/file_selector.dart';
-import 'pdf_viewer_page.dart'; // Importar pdf_viewer.dart
+import 'pdf_viewer_page.dart';
 import '../widgets/menu_drawer.dart';
 import '../providers/theme_provider.dart';
 import '../utils/app_strings.dart';
-import '../utils/theme_data.dart';
+//import '../utils/theme_data.dart';
 import '../screens/initial_setup_screen.dart';
 import 'dart:async';
 import '../models/pdf_document.dart';
 import '../providers/pdf_history_provider.dart';
 import 'history_screen.dart';
+import '../widgets/app_button.dart';
+import '../widgets/home_widgets/welcome_message.dart'; //Se añade el import.
+import '../widgets/home_widgets/select_pdf_button.dart'; //Se añade el import.
+import '../widgets/home_widgets/tap_detector.dart'; //Se añade el import.
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -41,9 +45,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
       if (mounted) {
         Navigator.push(
           context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  PdfViewerPage(pdfDocument: pdfDocument)), // Usar PdfViewerPage
+          MaterialPageRoute(builder: (context) => PdfViewerPage(pdfDocument: pdfDocument)),
         );
       }
     }
@@ -84,37 +86,37 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            shadows: const [
-              Shadow(blurRadius: 5, color: Colors.black26, offset: Offset(2, 2))
-            ],
+            shadows: const [Shadow(blurRadius: 5, color: Colors.black26, offset: Offset(2, 2))],
             color: isDark ? Colors.white : Colors.black,
           ),
         ),
         backgroundColor: isDark ? Colors.black : Colors.white,
-        iconTheme: IconThemeData(color: subThemes[themeState.selectedSubTheme]),
         leading: Transform.scale(
           scale: 1.2,
           child: Builder(
             builder: (BuildContext context) {
-              return IconButton(
-                icon: const Icon(Icons.menu),
+              return AppButton(
+                icon: Icons.menu,
                 onPressed: () {
                   Scaffold.of(context).openDrawer();
                 },
+                useSubThemeColor: true,
                 iconSize: 36,
               );
             },
           ),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.history),
+          AppButton(
+            icon: Icons.history,
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const HistoryScreen()),
               );
             },
+            useSubThemeColor: true,
+            iconSize: 30,
           ),
         ],
       ),
@@ -122,29 +124,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
         child: Stack(
           children: [
             const MenuDrawer(),
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: GestureDetector(
-                onTap: _handleTap,
-                child: Container(
-                  width: 60,
-                  height: 60,
-                  color: Colors.transparent,
-                  child: Align(
-                    alignment: Alignment.bottomLeft,
-                    child: Container(
-                      width: 10,
-                      height: 10,
-                      margin: const EdgeInsets.only(bottom: 20, left: 20),
-                      decoration: BoxDecoration(
-                        color: subThemes[themeState.selectedSubTheme],
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            TapDetector(onTap: _handleTap), //Se añade el widget.
           ],
         ),
       ),
@@ -154,41 +134,9 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              appStrings.getString('welcome'),
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: subThemes[themeState.selectedSubTheme],
-              ),
-              textAlign: TextAlign.center,
-            ),
+            const WelcomeMessage(), //Se añade el widget.
             const SizedBox(height: 30),
-            ElevatedButton.icon(
-              onPressed: pickPdfFile,
-              icon: Icon(
-                Icons.picture_as_pdf,
-                size: 30,
-                color: isDark ? Colors.white : Colors.black,
-              ),
-              label: Text(
-                appStrings.getString('select_pdf'),
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : Colors.black,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8)),
-                backgroundColor: subThemes[themeState.selectedSubTheme],
-                shadowColor: Colors.black45,
-                elevation: 10,
-              ),
-            ),
+            SelectPdfButton(onPressed: pickPdfFile), //Se añade el widget.
           ],
         ),
       ),

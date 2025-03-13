@@ -57,6 +57,13 @@ class AppStrings {
     'darkTheme': 'Activar tema oscuro',
     'saveSettings': 'Guardar Configuración',
     'pdfReaderNoAds': 'PDF READER SIN ANUNCIOS',
+    'history': 'Historial',
+    'open': 'Abiertos', // <-- AÑADIDO
+    'saved': 'Guardados', // <-- AÑADIDO
+    'file_information': 'Información del archivo',
+    'close': 'Cerrar',
+    'path': 'Ruta:',
+    'original': 'Original:',
   };
 
   static const Map<String, String> _englishStrings = {
@@ -92,6 +99,13 @@ class AppStrings {
     'darkTheme': 'Activate dark theme',
     'saveSettings': 'Save Settings',
     'pdfReaderNoAds': 'PDF READER NO ADS',
+    'history': 'History',
+    'open': 'Open', // <-- AÑADIDO
+    'saved': 'Saved', // <-- AÑADIDO
+    'file_information': 'File information',
+    'close': 'Close',
+    'path': 'Path:',
+    'original': 'Original:',
   };
 
   static const Map<String, String> _spanishColorNames = {
