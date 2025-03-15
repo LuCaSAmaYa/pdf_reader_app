@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:file_selector/file_selector.dart';
-import 'pdf_viewer_page.dart';
+//import 'pdf_viewer_page.dart';
 import '../widgets/menu_drawer.dart';
 import '../providers/theme_provider.dart';
 import '../utils/app_strings.dart';
-//import '../utils/theme_data.dart';
 import '../screens/initial_setup_screen.dart';
 import 'dart:async';
-import '../models/pdf_document.dart';
-import '../providers/pdf_history_provider.dart';
-import 'history_screen.dart';
+import 'package:uni_links/uni_links.dart'; //Se añade.
 import '../widgets/app_button.dart';
-import '../widgets/home_widgets/welcome_message.dart'; //Se añade el import.
-import '../widgets/home_widgets/select_pdf_button.dart'; //Se añade el import.
-import '../widgets/home_widgets/tap_detector.dart'; //Se añade el import.
+import '../widgets/home_widgets/welcome_message.dart';
+import '../widgets/home_widgets/select_pdf_button.dart';
+import '../widgets/home_widgets/tap_detector.dart';
+import '../services/pdf_opener_service.dart'; //Se añade el import.
+//import 'dart:io' show Platform; //Se añade el import.
+import 'dart:developer'; //Se añade el import.
+import 'history_screen.dart';
+import 'package:flutter/services.dart';//Se añade el import.
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -23,32 +24,52 @@ class HomeScreen extends ConsumerStatefulWidget {
   HomeScreenState createState() => HomeScreenState();
 }
 
-class HomeScreenState extends ConsumerState<HomeScreen> {
-  String? pdfPath;
+class HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObserver { //Se añade WidgetsBindingObserver
   int _tapCount = 0;
   Timer? _timer;
+  StreamSubscription? _sub;
+  //Uri? _initialUri;
+  //  Uri? _latestUri;
 
-  Future<void> pickPdfFile() async {
-    const XTypeGroup typeGroup = XTypeGroup(label: 'PDFs', extensions: ['pdf']);
-    final XFile? file = await openFile(acceptedTypeGroups: [typeGroup]);
+  @override
+  void initState() {
+    super.initState();
+     WidgetsBinding.instance.addObserver(this);
+    _initURIHandler(); //Se llama a la nueva funcion.
+     _incomingLinkHandler(); //Se llama a la nueva funcion.
+  }
 
-    if (file != null && mounted) {
-      final now = DateTime.now();
-      final pdfDocument = PdfDocument(
-        name: file.name,
-        path: file.path,
-        status: 'abierto',
-        date: now,
-      );
-      ref.read(pdfHistoryProvider.notifier).addPdf(pdfDocument);
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _sub?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
 
-      if (mounted) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => PdfViewerPage(pdfDocument: pdfDocument)),
-        );
+    Future<void> _initURIHandler() async { //Se cambia la funcion.
+    if(!mounted) return; //Se añade esta linea.
+    try {
+      final initialUri = await getInitialUri(); //Se utiliza la funcion de la dependencia.
+      if (initialUri != null) {
+        _handleExternalIntent(initialUri.path);
       }
+    } on PlatformException {
+      log('Failed to get initial uri');
+    } on FormatException {
+      log('Malformed initial uri');
     }
+  }
+
+  void _incomingLinkHandler() { //Se crea esta funcion.
+    if (!mounted) return; //Se añade esta linea.
+      _sub = uriLinkStream.listen((Uri? uri) { //Se utiliza la variable de la dependencia.
+        if(uri!=null){
+           _handleExternalIntent(uri.path);
+        }
+      }, onError: (Object err) {
+        if (!mounted) return;
+      });
   }
 
   void _handleTap() {
@@ -67,10 +88,9 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
+  Future<void> _handleExternalIntent(String path) async {
+    final pdfOpener = PdfOpenerService(ref, context);
+    pdfOpener.openPdfFromExternalApp(path);
   }
 
   @override
@@ -78,6 +98,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
     final themeState = ref.watch(themeProvider);
     final appStrings = AppStrings(themeState.locale);
     bool isDark = themeState.isDarkTheme;
+    final pdfOpener = PdfOpenerService(ref, context);
 
     return Scaffold(
       appBar: AppBar(
@@ -124,7 +145,7 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
         child: Stack(
           children: [
             const MenuDrawer(),
-            TapDetector(onTap: _handleTap), //Se añade el widget.
+            TapDetector(onTap: _handleTap),
           ],
         ),
       ),
@@ -134,9 +155,9 @@ class HomeScreenState extends ConsumerState<HomeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const WelcomeMessage(), //Se añade el widget.
+            const WelcomeMessage(),
             const SizedBox(height: 30),
-            SelectPdfButton(onPressed: pickPdfFile), //Se añade el widget.
+            SelectPdfButton(onPressed: pdfOpener.pickPdfFile), //Se llama a la nueva funcion.
           ],
         ),
       ),

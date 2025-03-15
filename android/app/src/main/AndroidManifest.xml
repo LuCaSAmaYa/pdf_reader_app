@@ -41,7 +41,12 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <!-- Para archivos en /storage con scheme 'file://' -->
+                <data android:scheme="file" /> <!--Se añade -->
                 <data android:mimeType="application/pdf"/>
+                <data android:scheme="content"/> <!--Se añade -->
+                <data android:scheme="http" /> <!--Se añade -->
+                <data android:scheme="https" /> <!--Se añade -->
+                <data android:mimeType="*/*" /> <!--Se añade -->
             </intent-filter>
 
         </activity>
